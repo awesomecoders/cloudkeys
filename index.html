@@ -15,39 +15,36 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="#search">Search</a></li>
             <li><a href="#import">Import</a></li>
           </ul>
         </div>
       </div>
     </div>
     <div class="container">
-      <div id="navi" class="col-md-2">
-        <div class="affix" role="complementary">
-          <ul class="nav">
-            <li><a data-category="Test">Test</a></li>
+      <div class="row">
+        <div id="searchbox" class="col-md-8 col-md-push-2">
+          <input type="text" id="search" placeholder="Search">
+        </div>
+      </div>
+      <div class="row">
+        <div id="content" class="col-md-12" role="main" style="height: 1800px;">
+          <ul class="items">
+            <li>Entity 1 <span>username</span></li>
+            <li>Entity 2 <span>username</span></li>
+            <li>Entity 3 <span>username</span></li>
+            <li>Entity 4 <span>username</span></li>
+            <li>Entity 5 <span>username</span></li>
+            <li>Entity 6 <span>username</span></li>
+            <li>Entity 7 <span>username</span></li>
+            <li>Entity 8 <span>username</span></li>
           </ul>
         </div>
-        <br style="clear: both" />
-      </div>
-
-      <div class="col-md-10" style="height: 1800px;">
-        <h3>Category: Test</h3>
-        <ul class="items">
-          <li>Entity 1</li>
-          <li>Entity 2</li>
-          <li>Entity 3</li>
-          <li>Entity 4</li>
-          <li>Entity 5</li>
-          <li>Entity 6</li>
-          <li>Entity 7</li>
-          <li>Entity 8</li>
-        </ul>
       </div>
 
     </div>
 
     <script src="//code.jquery.com/jquery.js"></script>
     <script src="bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="js/offcanvas.js"></script>
   </body>
 </html>

@@ -1,39 +1,44 @@
 body {
-  padding-top: 50px;
+  padding-top: 70px;
 }
-#navi {
-  padding: 0;
 
-  .affix {
-    background: #f7f5fa;
+#searchbox {
+  border: 1px solid #111111;
+  border-radius: 5px;
+  /* background-color: #333333; */
+  background-image: linear-gradient(to bottom, #666666 0%, #171717 100%);
+  margin: 20px 0;
+  padding: 20px 20px;
+
+  input {
+    border: 0;
     border-radius: 5px;
-    margin: 20px 0 0 0;
-    min-height: 100px;
-    padding: 10px 0;
-    width: 190px;
-  }
-  
-  ul {
+    display: block;
+    font-size: 36px;
+    height: 50px;
+    margin: 0px auto;
+    padding: 0 20px;
     width: 100%;
+  }
+}
 
+#content {
+  ul.items {
+    list-style: none;
+    padding: 0px;
+   
     li {
       cursor: pointer;
-      line-height: 25px;
+      padding: 5px 20px;
 
-      a {
-        color: #716b7a;
-        display: block;
-        padding: 5px 20px;
-      }
-
-      a:hover {
-        background-color: #e5e3e9;
+      span {
+        font-size: 70%;
+        font-style: italic;
+        padding: 0 0 0 20px;
       }
     }
+    li:hover {
+      background-color: #e5e3e9;
+    }
   }
-}
-
-
-ul#items {
-
 }
