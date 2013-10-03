@@ -15,12 +15,20 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="#import">Import</a></li>
+            <li><a id="importLink">Import</a></li>
           </ul>
         </div>
       </div>
     </div>
     <div class="container">
+      <div class="row" id="importContainer">
+        <div id="importer" class="col-md-8 col-md-push-2">
+          <textarea id="import"></textarea>
+        </div>
+        <div class="col-md-8 col-md-push-2">
+          <button class="btn btn-primary">Import</button>
+        </div>
+      </div>
       <div class="row">
         <div id="searchbox" class="col-md-8 col-md-push-2">
           <input type="text" id="search" placeholder="Search">
@@ -28,7 +36,7 @@
       </div>
       <div class="row">
         <div id="content" class="col-md-12" role="main" style="height: 1800px;">
-          <ul class="items">
+          <ul id="items">
             <li>Entity 1 <span>username</span></li>
             <li>Entity 2 <span>username</span></li>
             <li>Entity 3 <span>username</span></li>
@@ -42,9 +50,9 @@
       </div>
 
     </div>
-
+    <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
     <script src="//code.jquery.com/jquery.js"></script>
     <script src="bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="js/offcanvas.js"></script>
+    <script src="js/script.js"></script>
   </body>
 </html>
