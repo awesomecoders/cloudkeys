@@ -1,53 +1,142 @@
 class CloudKeys
   constructor: () ->
-    @fetchData()
-    @password = 'test' #todo replace with user password
-    $('#search').keyup =>
+    @entities = []
+    @version = ""
+    @password = '' #todo replace with user password
+    $('#pw').focus().keyup (evt) =>
       `var that = this`
-      @showItems(@getItems($(that).val()))
-      return
-    $('#search').focus()
+      if evt.keyCode is 13
+        @password = $(that).val()
+        @fetchData()
+        $('.hide').removeClass('hide')
+        $('#passwordRequest').addClass('hide')
+
+        $('#search').keyup =>
+          `var that = this`
+          @showItems(@getItems($(that).val()))
+          return
+        $('#search').focus()
+        $(window).keyup (evt) =>
+          if evt.altKey is true and evt.keyCode is 66
+            $('#items li.active .username').focus().select()
+          if evt.altKey is true and evt.keyCode is 79 # workaround to copy password very fast
+            $('#items li.active .passwordtoggle em').click()
+            $('#items li.active .password').focus().select()
+          if evt.altKey is true and evt.keyCode is 80
+            $('#items li.active .password').focus().select()
+          if evt.altKey is true and evt.keyCode is 85
+            $('#items li.active .url').focus().select()
 
   import: (xml) ->
     parsedXML = $.parseXML(xml)
 
-    entities = []
     for group in $(parsedXML).find('group')
       tag = $(group).find('>title').text()
       for entry in $(group).find('entry')
         e = $(entry)
         entity = {}
-        entity[@encrypt('title')] = @encrypt(e.find('title').text())
-        entity[@encrypt('username')] = @encrypt(e.find('username').text())
-        entity[@encrypt('password')] = @encrypt(e.find('password').text())
-        entity[@encrypt('url')] = @encrypt(e.find('url').text())
-        entity[@encrypt('comment')] = @encrypt(e.find('comment').text())
-        entity[@encrypt('tags')] = @encrypt(tag)
-        entities.push(entity)
-    #todo send it to server
-    console.log entities
+        entity['title'] = e.find('title').text()
+        entity['username'] = e.find('username').text()
+        entity['password'] = e.find('password').text()
+        entity['url'] = e.find('url').text()
+        entity['comment'] = e.find('comment').text()
+        entity['tags'] = tag
+        @entities.push(entity)
+    @updateData()
+
+  updateData: () ->
+    encrypted = @encrypt(JSON.stringify(@entities))
+    hash = CryptoJS.SHA1(encrypted).toString()
+
+    $.post 'ajax', {'version': @version, 'checksum': hash, 'data': encrypted}, (result) =>
+      if typeof result.error isnt "undefined"
+        alert "An error occured, please reload and try it again"
+      else
+        @updateInformation(result)
+    , "json"
 
   fetchData: () ->
     $.get 'ajax', (data) =>
-      console.log data
-
+      @updateInformation(data)
     , "json"
 
+  updateInformation: (data) ->
+    @version = data.version
+
+    if data.data == ""
+      @entities = []
+    else
+      try
+        @entities = $.parseJSON(@decrypt(data.data))
+      catch e
+        window.location.reload()
+
+    @showItems(@getItems($('#search').val()))
+
   encrypt: (value) ->
-    return String(CryptoJS.AES.encrypt(value, @password))
+    return CryptoJS.AES.encrypt(value, @password).toString()
 
   decrypt: (value) ->
-    return CryptoJS.AES.decrypt(value, @password)
+    return CryptoJS.AES.decrypt(value, @password).toString(CryptoJS.enc.Utf8)
+
+  getClippyCode: (value) ->
+    code = '<span class="clippy"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="14" height="14" class="clippy">'
+    code += '<param name="movie" value="js/clippy.swf"/><param name="allowScriptAccess" value="always" /><param name="quality" value="high" />'
+    code += "<param name=\"scale\" value=\"noscale\" /><param name=\"FlashVars\" value=\"text=#{encodeURIComponent(value)}\"><param name=\"bgcolor\" value=\"#e5e3e9\">"
+    code += "<embed src=\"js/clippy.swf\" width=\"14\" height=\"14\" name=\"clippy\" quality=\"high\" allowScriptAccess=\"always\" type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" FlashVars=\"text=#{encodeURIComponent(value)}\" bgcolor=\"#e5e3e9\" /></object></span>"
+    return code
 
   showItems: (items) ->
+    items.sort(@sortItems)
     $('#items li').remove()
     itemContainer = $('#items')
+    $('#resultdescription span').text(items.length)
     for item in items
-      itemContainer.append("<li>#{ item.title } <span>#{ item.username }</span></li>")
+      c = $("<li data-num=\"#{ item.num }\">#{ item.title } <span>#{ item.username }</span></li>")
+      ul = $("<ul></ul>")
+      password = ""
+      for char, i of item.password
+        password += "*"
+      ul.append("<li><label>Username:</label><input type=\"text\" class=\"username\" value=\"#{ item.username }\">#{ @getClippyCode(item.username) }<br></li>")
+      ul.append("<li class=\"passwordtoggle\"><label>Password:</label><input type=\"text\" class=\"password\" value=\"#{ password }\" data-toggle=\"#{ item.password }\"><em> (toggle visibility)</em></span>#{ @getClippyCode(item.password) }<br></li>")
+      ul.append("<li><label>URL:</label><input type=\"text\" class=\"url\" value=\"#{ item.url }\">#{ @getClippyCode(item.url) }<br></li>")
+      ul.append("<li><label>Comment:</label><input type=\"text\" class=\"comment\" value=\"#{ item.comment }\">#{ @getClippyCode(item.comment) }<br></li>")
+      ul.append("<li><label>Tags:</label><input type=\"text\" class=\"tags\" value=\"#{ item.tags }\">#{ @getClippyCode(item.tags) }<br></li>")
+      ul.find('.passwordtoggle em').click () =>
+        `var t = this`
+        elem = $(t).parent().find('.password')
+        original = elem.data('toggle')
+        elem.data('toggle', elem.val())
+        elem.val(original)
+      c.append(ul)
+
+      c.click =>
+        `var that = this`
+        elem = $(that)
+        if elem.hasClass('active') is false
+          $('#items li.active').removeClass('active').find('ul').slideUp()
+          elem.addClass('active')
+          elem.find('ul').slideDown()
+
+      c.find('input').focus().select()
+
+      itemContainer.append(c)
     return
 
   getItems: (search) ->
-    return [{'title': 'Bla bla', 'username': 'mthie'}]
+    result = []
+    re = new RegExp(search, 'i')
+    for item, i in @entities
+      if item.title.search(re) != -1 or item.username.search(re) != -1 or item.tags.search(re) != -1
+        item.num = i
+        result.push(item)
+
+    return result
+  
+  sortItems: (a, b) ->
+    aTitle = a.title.toLowerCase()
+    bTitle = b.title.toLowerCase()
+    `((aTitle < bTitle) ? -1 : ((aTitle > bTitle) ? 1 : 0))`
 
 window.CloudKeys = new CloudKeys()
 $('#importLink').click =>
