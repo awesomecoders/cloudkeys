@@ -6,11 +6,13 @@
   CloudKeys = (function() {
     function CloudKeys() {
       var _this = this;
+      this.fetchData();
       this.password = 'test';
       $('#search').keyup(function() {
         var that = this;
         _this.showItems(_this.getItems($(that).val()));
       });
+      $('#search').focus();
     }
 
     CloudKeys.prototype["import"] = function(xml) {
@@ -36,6 +38,13 @@
         }
       }
       return console.log(entities);
+    };
+
+    CloudKeys.prototype.fetchData = function() {
+      var _this = this;
+      return $.get('ajax', function(data) {
+        return console.log(data);
+      }, "json");
     };
 
     CloudKeys.prototype.encrypt = function(value) {
