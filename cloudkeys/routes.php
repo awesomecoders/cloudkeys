@@ -1,8 +1,7 @@
 <?php
 
 $routes = array(
-    '|/test/$|' => 'TestappTestHandler'
-  , '|/$|' => 'TestappMainHandler'
+    '|/$|' => 'OverviewHandler'
 
   , '|.|' => 'TestappError404Handler'
 );
