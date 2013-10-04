@@ -13,6 +13,7 @@ if(file_exists('cloudkeys/settings_local.ini')) {
   $config = new ConfigIni('cloudkeys/settings.ini', null);
 }
 S3::setAuth($config->get('AWSAccessKey'), $config->get('AWSSecretKey'));
+S3::setExceptions(true);
 
 $dispatcher = new Dispatcher(
     $config
