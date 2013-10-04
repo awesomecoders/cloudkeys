@@ -13,7 +13,8 @@ class RegisterHandler extends BaseHttpHandler {
       && $password != ""
       && $password == $this->request->get('password_repeat')) {
         if(!$this->userExists($username)) {
-          $doc = array('metadata' => array(), 'data' => array());
+          $doc = array('metadata' => array(), 'data' => '');
+          $doc['metadata']['version'] = '';
           $doc['metadata']['password'] = sha1($this->config->get('passwordSalt') . $password);
           S3::putObject(json_encode($doc), $this->config->get('AWSS3Bucket'), $this->createUserFilename($username), S3::ACL_PRIVATE);
           $this->response->set('created', true);
