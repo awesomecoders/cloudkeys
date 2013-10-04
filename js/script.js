@@ -6,19 +6,43 @@
   CloudKeys = (function() {
     function CloudKeys() {
       var _this = this;
-      this.fetchData();
-      this.password = 'test';
-      $('#search').keyup(function() {
+      this.entities = [];
+      this.version = "";
+      this.password = '';
+      $('#pw').focus().keyup(function(evt) {
         var that = this;
-        _this.showItems(_this.getItems($(that).val()));
+        if (evt.keyCode === 13) {
+          _this.password = $(that).val();
+          _this.fetchData();
+          $('.hide').removeClass('hide');
+          $('#passwordRequest').addClass('hide');
+          $('#search').keyup(function() {
+            var that = this;
+            _this.showItems(_this.getItems($(that).val()));
+          });
+          $('#search').focus();
+          return $(window).keyup(function(evt) {
+            if (evt.altKey === true && evt.keyCode === 66) {
+              $('#items li.active .username').focus().select();
+            }
+            if (evt.altKey === true && evt.keyCode === 79) {
+              $('#items li.active .passwordtoggle em').click();
+              $('#items li.active .password').focus().select();
+            }
+            if (evt.altKey === true && evt.keyCode === 80) {
+              $('#items li.active .password').focus().select();
+            }
+            if (evt.altKey === true && evt.keyCode === 85) {
+              return $('#items li.active .url').focus().select();
+            }
+          });
+        }
       });
-      $('#search').focus();
     }
 
     CloudKeys.prototype["import"] = function(xml) {
-      var e, entities, entity, entry, group, parsedXML, tag, _i, _j, _len, _len1, _ref, _ref1;
+      var e, entity, entry, group, parsedXML, tag, _i, _j, _len, _len1, _ref, _ref1;
       parsedXML = $.parseXML(xml);
-      entities = [];
       _ref = $(parsedXML).find('group');
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         group = _ref[_i];
@@ -28,50 +52,142 @@
           entry = _ref1[_j];
           e = $(entry);
           entity = {};
-          entity[this.encrypt('title')] = this.encrypt(e.find('title').text());
-          entity[this.encrypt('username')] = this.encrypt(e.find('username').text());
-          entity[this.encrypt('password')] = this.encrypt(e.find('password').text());
-          entity[this.encrypt('url')] = this.encrypt(e.find('url').text());
-          entity[this.encrypt('comment')] = this.encrypt(e.find('comment').text());
-          entity[this.encrypt('tags')] = this.encrypt(tag);
-          entities.push(entity);
+          entity['title'] = e.find('title').text();
+          entity['username'] = e.find('username').text();
+          entity['password'] = e.find('password').text();
+          entity['url'] = e.find('url').text();
+          entity['comment'] = e.find('comment').text();
+          entity['tags'] = tag;
+          this.entities.push(entity);
         }
       }
-      return console.log(entities);
+      return this.updateData();
+    };
+
+    CloudKeys.prototype.updateData = function() {
+      var encrypted, hash,
+        _this = this;
+      encrypted = this.encrypt(JSON.stringify(this.entities));
+      hash = CryptoJS.SHA1(encrypted).toString();
+      return $.post('ajax', {
+        'version': this.version,
+        'checksum': hash,
+        'data': encrypted
+      }, function(result) {
+        if (typeof result.error !== "undefined") {
+          return alert("An error occured, please reload and try it again");
+        } else {
+          return _this.updateInformation(result);
+        }
+      }, "json");
     };
 
     CloudKeys.prototype.fetchData = function() {
       var _this = this;
       return $.get('ajax', function(data) {
-        return console.log(data);
+        return _this.updateInformation(data);
       }, "json");
     };
 
+    CloudKeys.prototype.updateInformation = function(data) {
+      var e;
+      this.version = data.version;
+      if (data.data === "") {
+        this.entities = [];
+      } else {
+        try {
+          this.entities = $.parseJSON(this.decrypt(data.data));
+        } catch (_error) {
+          e = _error;
+          window.location.reload();
+        }
+      }
+      return this.showItems(this.getItems($('#search').val()));
+    };
+
     CloudKeys.prototype.encrypt = function(value) {
-      return String(CryptoJS.AES.encrypt(value, this.password));
+      return CryptoJS.AES.encrypt(value, this.password).toString();
     };
 
     CloudKeys.prototype.decrypt = function(value) {
-      return CryptoJS.AES.decrypt(value, this.password);
+      return CryptoJS.AES.decrypt(value, this.password).toString(CryptoJS.enc.Utf8);
+    };
+
+    CloudKeys.prototype.getClippyCode = function(value) {
+      var code;
+      code = '<span class="clippy"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="14" height="14" class="clippy">';
+      code += '<param name="movie" value="js/clippy.swf"/><param name="allowScriptAccess" value="always" /><param name="quality" value="high" />';
+      code += "<param name=\"scale\" value=\"noscale\" /><param name=\"FlashVars\" value=\"text=" + (encodeURIComponent(value)) + "\"><param name=\"bgcolor\" value=\"#e5e3e9\">";
+      code += "<embed src=\"js/clippy.swf\" width=\"14\" height=\"14\" name=\"clippy\" quality=\"high\" allowScriptAccess=\"always\" type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" FlashVars=\"text=" + (encodeURIComponent(value)) + "\" bgcolor=\"#e5e3e9\" /></object></span>";
+      return code;
     };
 
     CloudKeys.prototype.showItems = function(items) {
-      var item, itemContainer, _i, _len;
+      var c, char, i, item, itemContainer, password, ul, _i, _len, _ref,
+        _this = this;
+      items.sort(this.sortItems);
       $('#items li').remove();
       itemContainer = $('#items');
+      $('#resultdescription span').text(items.length);
       for (_i = 0, _len = items.length; _i < _len; _i++) {
         item = items[_i];
-        itemContainer.append("<li>" + item.title + " <span>" + item.username + "</span></li>");
+        c = $("<li data-num=\"" + item.num + "\">" + item.title + " <span>" + item.username + "</span></li>");
+        ul = $("<ul></ul>");
+        password = "";
+        _ref = item.password;
+        for (char in _ref) {
+          i = _ref[char];
+          password += "*";
+        }
+        ul.append("<li><label>Username:</label><input type=\"text\" class=\"username\" value=\"" + item.username + "\">" + (this.getClippyCode(item.username)) + "<br></li>");
+        ul.append("<li class=\"passwordtoggle\"><label>Password:</label><input type=\"text\" class=\"password\" value=\"" + password + "\" data-toggle=\"" + item.password + "\"><em> (toggle visibility)</em></span>" + (this.getClippyCode(item.password)) + "<br></li>");
+        ul.append("<li><label>URL:</label><input type=\"text\" class=\"url\" value=\"" + item.url + "\">" + (this.getClippyCode(item.url)) + "<br></li>");
+        ul.append("<li><label>Comment:</label><input type=\"text\" class=\"comment\" value=\"" + item.comment + "\">" + (this.getClippyCode(item.comment)) + "<br></li>");
+        ul.append("<li><label>Tags:</label><input type=\"text\" class=\"tags\" value=\"" + item.tags + "\">" + (this.getClippyCode(item.tags)) + "<br></li>");
+        ul.find('.passwordtoggle em').click(function() {
+          var t = this;
+          var elem, original;
+          elem = $(t).parent().find('.password');
+          original = elem.data('toggle');
+          elem.data('toggle', elem.val());
+          return elem.val(original);
+        });
+        c.append(ul);
+        c.click(function() {
+          var that = this;
+          var elem;
+          elem = $(that);
+          if (elem.hasClass('active') === false) {
+            $('#items li.active').removeClass('active').find('ul').slideUp();
+            elem.addClass('active');
+            return elem.find('ul').slideDown();
+          }
+        });
+        c.find('input').focus().select();
+        itemContainer.append(c);
       }
     };
 
     CloudKeys.prototype.getItems = function(search) {
-      return [
-        {
-          'title': 'Bla bla',
-          'username': 'mthie'
+      var i, item, re, result, _i, _len, _ref;
+      result = [];
+      re = new RegExp(search, 'i');
+      _ref = this.entities;
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        item = _ref[i];
+        if (item.title.search(re) !== -1 || item.username.search(re) !== -1 || item.tags.search(re) !== -1) {
+          item.num = i;
+          result.push(item);
         }
-      ];
+      }
+      return result;
+    };
+
+    CloudKeys.prototype.sortItems = function(a, b) {
+      var aTitle, bTitle;
+      aTitle = a.title.toLowerCase();
+      bTitle = b.title.toLowerCase();
+      return ((aTitle < bTitle) ? -1 : ((aTitle > bTitle) ? 1 : 0));
     };
 
     return CloudKeys;
