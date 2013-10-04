@@ -1,10 +1,12 @@
 class CloudKeys
   constructor: () ->
+    @fetchData()
     @password = 'test' #todo replace with user password
     $('#search').keyup =>
       `var that = this`
       @showItems(@getItems($(that).val()))
       return
+    $('#search').focus()
 
   import: (xml) ->
     parsedXML = $.parseXML(xml)
@@ -24,6 +26,12 @@ class CloudKeys
         entities.push(entity)
     #todo send it to server
     console.log entities
+
+  fetchData: () ->
+    $.get 'ajax', (data) =>
+      console.log data
+
+    , "json"
 
   encrypt: (value) ->
     return String(CryptoJS.AES.encrypt(value, @password))
