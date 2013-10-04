@@ -4,3 +4,6 @@
 [submodule "lib/framework"]
 	path = lib/framework
 	url = git://github.com/Luzifer/PHPFramework.git
+[submodule "lib/s3"]
+	path = lib/s3
+	url = https://github.com/tpyo/amazon-s3-php-class.git
