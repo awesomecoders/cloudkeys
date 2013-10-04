@@ -7,7 +7,14 @@
     <link href="css/style.css" rel="stylesheet" media="screen">
   </head>
   <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div id="passwordRequest" class="container">
+      <div class="row">
+        <div id="searchbox" class="col-md-8 col-md-push-2">
+          <input type="password" id="pw" placeholder="Password">
+        </div>
+      </div>
+    </div>
+    <div class="navbar navbar-inverse navbar-fixed-top hide">
       <div class="container">
         <div class="navbar-header">
           <a class="navbar-brand" href="#">cloud<strong>keys</strong></a>
@@ -20,7 +27,7 @@
         </div>
       </div>
     </div>
-    <div class="container">
+    <div class="container hide">
       <div class="row" id="importContainer">
         <div id="importer" class="col-md-8 col-md-push-2">
           <textarea id="import"></textarea>
@@ -36,21 +43,15 @@
       </div>
       <div class="row">
         <div id="content" class="col-md-12" role="main" style="height: 1800px;">
+          <div id="resultdescription" class="col-md-12">Search results: <span>0</span> items</div>
           <ul id="items">
-            <li>Entity 1 <span>username</span></li>
-            <li>Entity 2 <span>username</span></li>
-            <li>Entity 3 <span>username</span></li>
-            <li>Entity 4 <span>username</span></li>
-            <li>Entity 5 <span>username</span></li>
-            <li>Entity 6 <span>username</span></li>
-            <li>Entity 7 <span>username</span></li>
-            <li>Entity 8 <span>username</span></li>
           </ul>
         </div>
       </div>
 
     </div>
     <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+    <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
     <script src="//code.jquery.com/jquery.js"></script>
     <script src="bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="js/script.js"></script>
