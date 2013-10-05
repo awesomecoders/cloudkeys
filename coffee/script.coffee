@@ -45,7 +45,8 @@ class CloudKeys
         entity['comment'] = e.find('comment').text()
         entity['tags'] = tag
         @entities.push(entity)
-    @updateData()
+    @updateData =>
+      $('#importLink').click()
 
   updateData: (callback) ->
     encrypted = @encrypt(JSON.stringify(@entities))
@@ -165,6 +166,16 @@ class CloudKeys
       $('#editDialog button.btn-danger').addClass('hide')
 
     $('#editDialog').modal({})
+    $('#editDialog .btn-danger').unbind('click').click =>
+      confirmation = confirm('Are you sure?')
+      if confirmation is true
+        num = $('#editDialog input[name="num"]').val()
+        if typeof num isnt "undefined" and typeof num isnt null and num != ""
+          @entities.splice(num, 1)
+
+          @updateData =>
+            $('#formClose').click()
+
     $('#editDialog .btn-primary').unbind('click').click =>
       if @validateForm()
         num = $('#editDialog input[name="num"]').val()

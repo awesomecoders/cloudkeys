@@ -44,7 +44,8 @@
     }
 
     CloudKeys.prototype["import"] = function(xml) {
-      var e, entity, entry, group, parsedXML, tag, _i, _j, _len, _len1, _ref, _ref1;
+      var e, entity, entry, group, parsedXML, tag, _i, _j, _len, _len1, _ref, _ref1,
+        _this = this;
       parsedXML = $.parseXML(xml);
       _ref = $(parsedXML).find('group');
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -64,7 +65,9 @@
           this.entities.push(entity);
         }
       }
-      return this.updateData();
+      return this.updateData(function() {
+        return $('#importLink').click();
+      });
     };
 
     CloudKeys.prototype.updateData = function(callback) {
@@ -223,6 +226,19 @@
         $('#editDialog button.btn-danger').addClass('hide');
       }
       $('#editDialog').modal({});
+      $('#editDialog .btn-danger').unbind('click').click(function() {
+        var confirmation;
+        confirmation = confirm('Are you sure?');
+        if (confirmation === true) {
+          num = $('#editDialog input[name="num"]').val();
+          if (typeof num !== "undefined" && typeof num !== null && num !== "") {
+            _this.entities.splice(num, 1);
+            return _this.updateData(function() {
+              return $('#formClose').click();
+            });
+          }
+        }
+      });
       return $('#editDialog .btn-primary').unbind('click').click(function() {
         var entity, field, _j, _len1;
         if (_this.validateForm()) {
