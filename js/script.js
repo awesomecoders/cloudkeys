@@ -66,6 +66,7 @@
         }
       }
       return this.updateData(function() {
+        $('#import').val('');
         return $('#importLink').click();
       });
     };

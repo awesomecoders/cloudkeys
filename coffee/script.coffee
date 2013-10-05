@@ -46,6 +46,7 @@ class CloudKeys
         entity['tags'] = tag
         @entities.push(entity)
     @updateData =>
+      $('#import').val('')
       $('#importLink').click()
 
   updateData: (callback) ->
