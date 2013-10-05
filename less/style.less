@@ -74,13 +74,17 @@ input {
         display: none;
         list-style: none;
         padding-left: 5px;
-        
+       
+        li.last {
+          display: none;
+          @media (min-width:768px) {
+            border-bottom: 0;  
+            display: block;
+          }
+        }
         li {
           border-bottom: 1px dotted gray;
-          /* clear: both;
-          height: 27px;
-          position: relative; */
-
+          
           br { clear: both; }
           
           label {
@@ -89,7 +93,7 @@ input {
             width: 100px;
           }
 
-          input {
+          input, textarea {
             background: transparent;
             border: 0;
             float: left;
