@@ -7,7 +7,7 @@ class RegisterHandler extends BaseHttpHandler {
   }
 
   public function post($params) {
-    $username = $this->request->get('username');
+    $username = strtolower($this->request->get('username'));
     $password = $this->request->get('password');
     if($username != ""
       && $password != ""
