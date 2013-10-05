@@ -132,7 +132,7 @@
     };
 
     CloudKeys.prototype.showItems = function(items) {
-      var c, char, i, item, itemContainer, password, ul, _i, _len, _ref,
+      var c, char, counter, i, item, itemContainer, lines_match, password, ul, _i, _len, _ref,
         _this = this;
       items.sort(this.sortItems);
       $('#items li').remove();
@@ -151,7 +151,14 @@
         ul.append("<li><label>Username:</label><input type=\"text\" class=\"username\" value=\"" + item.username + "\">" + (this.getClippyCode(item.username)) + "<br></li>");
         ul.append("<li class=\"passwordtoggle\"><label>Password:</label><input type=\"text\" class=\"password\" value=\"" + password + "\" data-toggle=\"" + item.password + "\"><em> (toggle visibility)</em></span>" + (this.getClippyCode(item.password)) + "<br></li>");
         ul.append("<li><label>URL:</label><input type=\"text\" class=\"url\" value=\"" + item.url + "\">" + (this.getClippyCode(item.url)) + "<br></li>");
-        ul.append("<li><label>Comment:</label><textarea class=\"comment\">" + item.comment + "</textarea>" + (this.getClippyCode(item.comment)) + "<br></li>");
+        lines_match = item.comment.match(/\n/g);
+        if (lines_match !== null) {
+          counter = lines_match.length;
+        }
+        if (counter < 2) {
+          counter = 2;
+        }
+        ul.append("<li><label>Comment:</label><textarea class=\"comment\" rows=\"" + (counter + 2) + "\">" + item.comment + "</textarea>" + (this.getClippyCode(item.comment)) + "<br></li>");
         ul.append("<li><label>Tags:</label><input type=\"text\" class=\"tags\" value=\"" + item.tags + "\">" + (this.getClippyCode(item.tags)) + "<br></li>");
         ul.append("<li class=\"last\"><button class=\"btn btn-primary\">Edit</button><br></li>");
         ul.find('.btn-primary').click(function() {
