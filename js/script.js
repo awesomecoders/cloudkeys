@@ -14,6 +14,9 @@
         if (evt.keyCode === 13) {
           _this.password = $(that).val();
           _this.fetchData();
+          $('#newEntityLink').click(function() {
+            return _this.showForm();
+          });
           $('.hide').removeClass('hide');
           $('#passwordRequest').addClass('hide');
           $('#search').keyup(function() {
@@ -64,7 +67,7 @@
       return this.updateData();
     };
 
-    CloudKeys.prototype.updateData = function() {
+    CloudKeys.prototype.updateData = function(callback) {
       var encrypted, hash,
         _this = this;
       encrypted = this.encrypt(JSON.stringify(this.entities));
@@ -77,6 +80,9 @@
         if (typeof result.error !== "undefined") {
           return alert("An error occured, please reload and try it again");
         } else {
+          if (typeof callback !== "undefined") {
+            callback();
+          }
           return _this.updateInformation(result);
         }
       }, "json");
@@ -142,8 +148,17 @@
         ul.append("<li><label>Username:</label><input type=\"text\" class=\"username\" value=\"" + item.username + "\">" + (this.getClippyCode(item.username)) + "<br></li>");
         ul.append("<li class=\"passwordtoggle\"><label>Password:</label><input type=\"text\" class=\"password\" value=\"" + password + "\" data-toggle=\"" + item.password + "\"><em> (toggle visibility)</em></span>" + (this.getClippyCode(item.password)) + "<br></li>");
         ul.append("<li><label>URL:</label><input type=\"text\" class=\"url\" value=\"" + item.url + "\">" + (this.getClippyCode(item.url)) + "<br></li>");
-        ul.append("<li><label>Comment:</label><input type=\"text\" class=\"comment\" value=\"" + item.comment + "\">" + (this.getClippyCode(item.comment)) + "<br></li>");
+        ul.append("<li><label>Comment:</label><textarea class=\"comment\">" + item.comment + "</textarea>" + (this.getClippyCode(item.comment)) + "<br></li>");
         ul.append("<li><label>Tags:</label><input type=\"text\" class=\"tags\" value=\"" + item.tags + "\">" + (this.getClippyCode(item.tags)) + "<br></li>");
+        ul.append("<li class=\"last\"><button class=\"btn btn-primary\">Edit</button><br></li>");
+        ul.find('.btn-primary').click(function() {
+          var t = this;
+          var num;
+          num = $(t).parent().parent().parent().data('num');
+          if (typeof num !== "undefined" && typeof num !== null) {
+            return _this.showForm(num);
+          }
+        });
         ul.find('.passwordtoggle em').click(function() {
           var t = this;
           var elem, original;
@@ -188,6 +203,60 @@
       aTitle = a.title.toLowerCase();
       bTitle = b.title.toLowerCase();
       return ((aTitle < bTitle) ? -1 : ((aTitle > bTitle) ? 1 : 0));
+    };
+
+    CloudKeys.prototype.showForm = function(num) {
+      var elem, fields, _i, _len,
+        _this = this;
+      $('#editDialog input').val('');
+      $('#editDialog textarea').val('');
+      $('#editDialog .hide').removeClass('hide');
+      fields = ['title', 'username', 'password', 'url', 'comment', 'tags'];
+      if (typeof num !== "undefined" && typeof this.entities[num] !== "undefined") {
+        $('#editDialog input[name="num"]').val(num);
+        for (_i = 0, _len = fields.length; _i < _len; _i++) {
+          elem = fields[_i];
+          $("#editDialog #" + elem).val(this.entities[num][elem]);
+        }
+        $("#editDialog input#repeat_password").val(this.entities[num]['password']);
+      } else {
+        $('#editDialog button.btn-danger').addClass('hide');
+      }
+      $('#editDialog').modal({});
+      return $('#editDialog .btn-primary').unbind('click').click(function() {
+        var entity, field, _j, _len1;
+        if (_this.validateForm()) {
+          num = $('#editDialog input[name="num"]').val();
+          entity = {};
+          for (_j = 0, _len1 = fields.length; _j < _len1; _j++) {
+            field = fields[_j];
+            entity[field] = $("#" + field).val();
+          }
+          if (typeof num !== "undefined" && num !== "") {
+            _this.entities[num] = entity;
+          } else {
+            _this.entities.push(entity);
+          }
+          _this.updateData(function() {
+            return $('#formClose').click();
+          });
+        }
+      });
+    };
+
+    CloudKeys.prototype.validateForm = function() {
+      var success;
+      $('#editDialog .has-error').removeClass('has-error');
+      success = true;
+      if ($('#title').val() === "") {
+        $('#title').parent().addClass('has-error');
+        success = false;
+      }
+      if ($('#password').val() !== "" && $('#repeat_password').val() !== $('#password').val()) {
+        $('#password, #repeat_password').parent().addClass('has-error');
+        success = false;
+      }
+      return success;
     };
 
     return CloudKeys;
