@@ -5,6 +5,7 @@ $routes = array(
   , '|/ajax$|' => 'AjaxHandler'
   , '|/overview$|' => 'OverviewHandler'
   , '|/register$|' => 'RegisterHandler'
+  , '|/logout$|' => 'LogoutHandler'
   , '|/login$|' => 'LoginHandler'
   , '|.|' => 'TestappError404Handler'
 );
