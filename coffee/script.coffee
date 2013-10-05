@@ -8,6 +8,9 @@ class CloudKeys
       if evt.keyCode is 13
         @password = $(that).val()
         @fetchData()
+        $('#newEntityLink').click =>
+          @showForm()
+
         $('.hide').removeClass('hide')
         $('#passwordRequest').addClass('hide')
 
@@ -44,7 +47,7 @@ class CloudKeys
         @entities.push(entity)
     @updateData()
 
-  updateData: () ->
+  updateData: (callback) ->
     encrypted = @encrypt(JSON.stringify(@entities))
     hash = CryptoJS.SHA1(encrypted).toString()
 
@@ -52,6 +55,8 @@ class CloudKeys
       if typeof result.error isnt "undefined"
         alert "An error occured, please reload and try it again"
       else
+        if typeof callback isnt "undefined"
+          callback()
         @updateInformation(result)
     , "json"
 
@@ -100,8 +105,15 @@ class CloudKeys
       ul.append("<li><label>Username:</label><input type=\"text\" class=\"username\" value=\"#{ item.username }\">#{ @getClippyCode(item.username) }<br></li>")
       ul.append("<li class=\"passwordtoggle\"><label>Password:</label><input type=\"text\" class=\"password\" value=\"#{ password }\" data-toggle=\"#{ item.password }\"><em> (toggle visibility)</em></span>#{ @getClippyCode(item.password) }<br></li>")
       ul.append("<li><label>URL:</label><input type=\"text\" class=\"url\" value=\"#{ item.url }\">#{ @getClippyCode(item.url) }<br></li>")
-      ul.append("<li><label>Comment:</label><input type=\"text\" class=\"comment\" value=\"#{ item.comment }\">#{ @getClippyCode(item.comment) }<br></li>")
+      ul.append("<li><label>Comment:</label><textarea class=\"comment\">#{ item.comment }</textarea>#{ @getClippyCode(item.comment) }<br></li>")
       ul.append("<li><label>Tags:</label><input type=\"text\" class=\"tags\" value=\"#{ item.tags }\">#{ @getClippyCode(item.tags) }<br></li>")
+      ul.append("<li class=\"last\"><button class=\"btn btn-primary\">Edit</button><br></li>")
+      ul.find('.btn-primary').click () =>
+        `var t = this`
+        num = $(t).parent().parent().parent().data('num')
+        if typeof num isnt "undefined" and typeof num isnt null
+          @showForm(num)
+
       ul.find('.passwordtoggle em').click () =>
         `var t = this`
         elem = $(t).parent().find('.password')
@@ -137,6 +149,49 @@ class CloudKeys
     aTitle = a.title.toLowerCase()
     bTitle = b.title.toLowerCase()
     `((aTitle < bTitle) ? -1 : ((aTitle > bTitle) ? 1 : 0))`
+
+  showForm: (num) ->
+    $('#editDialog input').val('')
+    $('#editDialog textarea').val('')
+    $('#editDialog .hide').removeClass('hide')
+    fields = ['title', 'username', 'password', 'url', 'comment', 'tags']
+
+    if typeof num isnt "undefined" and typeof @entities[num] isnt "undefined"
+      $('#editDialog input[name="num"]').val(num)
+      for elem in fields
+        $("#editDialog ##{elem}").val(@entities[num][elem])
+      $("#editDialog input#repeat_password").val(@entities[num]['password'])
+    else
+      $('#editDialog button.btn-danger').addClass('hide')
+
+    $('#editDialog').modal({})
+    $('#editDialog .btn-primary').unbind('click').click =>
+      if @validateForm()
+        num = $('#editDialog input[name="num"]').val()
+        entity = {}
+        for field in fields
+          entity[field] = $("##{field}").val()
+        if typeof num != "undefined" and num != ""
+          @entities[num] = entity
+        else
+          @entities.push(entity)
+
+        @updateData =>
+          $('#formClose').click()
+      return
+
+  validateForm: () ->
+    $('#editDialog .has-error').removeClass('has-error')
+    success = true
+    if $('#title').val() == ""
+      $('#title').parent().addClass('has-error')
+      success = false
+
+    if $('#password').val() isnt "" && $('#repeat_password').val() isnt $('#password').val()
+      $('#password, #repeat_password').parent().addClass('has-error')
+      success = false
+
+    return success
 
 window.CloudKeys = new CloudKeys()
 $('#importLink').click =>
