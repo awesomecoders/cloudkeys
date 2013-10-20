@@ -16,7 +16,7 @@ class CloudKeys
 
         $('#search').keyup =>
           `var that = this`
-          @showItems(@getItems($(that).val()))
+          @limitItems(@getItems($(that).val()))
           return
         $('#search').focus()
         $(window).keyup (evt) =>
@@ -78,6 +78,8 @@ class CloudKeys
       catch e
         window.location.reload()
 
+    @entities.sort(@sortItems)
+
     @showItems(@getItems($('#search').val()))
 
   encrypt: (value) ->
@@ -93,12 +95,24 @@ class CloudKeys
     code += "<embed src=\"js/clippy.swf\" width=\"14\" height=\"14\" name=\"clippy\" quality=\"high\" allowScriptAccess=\"always\" type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" FlashVars=\"text=#{encodeURIComponent(value)}\" bgcolor=\"#e5e3e9\" /></object></span>"
     return code
 
+  limitItems: (items) ->
+    $('#resultdescription span').text(items.length)
+    $('#items>li').each (k, v) =>
+      item = $(v)
+      if $.inArray(item.data('num'), items) is -1
+        item.addClass('hide')
+      else
+        if item.hasClass('hide')
+          item.removeClass('hide')
+      return
+    return
+
   showItems: (items) ->
-    items.sort(@sortItems)
     $('#items li').remove()
     itemContainer = $('#items')
     $('#resultdescription span').text(items.length)
     for item in items
+      item = @entities[item]
       c = $("<li data-num=\"#{ item.num }\">#{ item.title } <span>#{ item.username }</span></li>")
       ul = $("<ul></ul>")
       password = ""
@@ -144,11 +158,11 @@ class CloudKeys
 
   getItems: (search) ->
     result = []
-    re = new RegExp(search, 'i')
+    search = search.toLowerCase()
     for item, i in @entities
-      if item.title.search(re) != -1 or item.username.search(re) != -1 or item.tags.search(re) != -1
+      if item.title.toLowerCase().indexOf(search) != -1 or item.username.toLowerCase().indexOf(search) != -1 or item.tags.toLowerCase().indexOf(search) != -1
         item.num = i
-        result.push(item)
+        result.push(i)
 
     return result
   

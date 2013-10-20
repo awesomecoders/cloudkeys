@@ -21,7 +21,7 @@
           $('#passwordRequest').addClass('hide');
           $('#search').keyup(function() {
             var that = this;
-            _this.showItems(_this.getItems($(that).val()));
+            _this.limitItems(_this.getItems($(that).val()));
           });
           $('#search').focus();
           return $(window).keyup(function(evt) {
@@ -112,6 +112,7 @@
           window.location.reload();
         }
       }
+      this.entities.sort(this.sortItems);
       return this.showItems(this.getItems($('#search').val()));
     };
 
@@ -132,15 +133,31 @@
       return code;
     };
 
+    CloudKeys.prototype.limitItems = function(items) {
+      var _this = this;
+      $('#resultdescription span').text(items.length);
+      $('#items>li').each(function(k, v) {
+        var item;
+        item = $(v);
+        if ($.inArray(item.data('num'), items) === -1) {
+          item.addClass('hide');
+        } else {
+          if (item.hasClass('hide')) {
+            item.removeClass('hide');
+          }
+        }
+      });
+    };
+
     CloudKeys.prototype.showItems = function(items) {
       var c, char, counter, i, item, itemContainer, lines_match, password, ul, _i, _len, _ref,
         _this = this;
-      items.sort(this.sortItems);
       $('#items li').remove();
       itemContainer = $('#items');
       $('#resultdescription span').text(items.length);
       for (_i = 0, _len = items.length; _i < _len; _i++) {
         item = items[_i];
+        item = this.entities[item];
         c = $("<li data-num=\"" + item.num + "\">" + item.title + " <span>" + item.username + "</span></li>");
         ul = $("<ul></ul>");
         password = "";
@@ -195,15 +212,15 @@
     };
 
     CloudKeys.prototype.getItems = function(search) {
-      var i, item, re, result, _i, _len, _ref;
+      var i, item, result, _i, _len, _ref;
       result = [];
-      re = new RegExp(search, 'i');
+      search = search.toLowerCase();
       _ref = this.entities;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         item = _ref[i];
-        if (item.title.search(re) !== -1 || item.username.search(re) !== -1 || item.tags.search(re) !== -1) {
+        if (item.title.toLowerCase().indexOf(search) !== -1 || item.username.toLowerCase().indexOf(search) !== -1 || item.tags.toLowerCase().indexOf(search) !== -1) {
           item.num = i;
-          result.push(item);
+          result.push(i);
         }
       }
       return result;
