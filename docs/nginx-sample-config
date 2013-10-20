@@ -1,0 +1,12 @@
+location ~ /cloudkeys {
+       try_files $uri $uri/ /cloudkeys/index.php$is_args$args;
+       location ~ ^/cloudkeys/(.+\.php)$ {
+               fastcgi_pass unix:/var/run/php5-fpm.sock;
+               fastcgi_index index.php;
+               include fastcgi_params;
+       }
+
+       location ~ ^/cloudkeys/cloudkeys/ {
+         deny all;
+       }
+}
