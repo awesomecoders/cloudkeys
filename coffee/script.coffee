@@ -97,13 +97,19 @@ class CloudKeys
 
   limitItems: (items) ->
     $('#resultdescription span').text(items.length)
+    current = 0
     $('#items>li').each (k, v) =>
       item = $(v)
+      item.removeClass('odd')
       if $.inArray(item.data('num'), items) is -1
         item.addClass('hide')
       else
         if item.hasClass('hide')
           item.removeClass('hide')
+
+        if current % 2 is 0
+          item.addClass('odd')
+        current = current + 1
       return
     return
 
@@ -111,9 +117,12 @@ class CloudKeys
     $('#items li').remove()
     itemContainer = $('#items')
     $('#resultdescription span').text(items.length)
-    for item in items
+    for item, i in items
+      additionalClass = ""
+      if i % 2 is 0
+        additionalClass = "odd"
       item = @entities[item]
-      c = $("<li data-num=\"#{ item.num }\">#{ item.title } <span>#{ item.username }</span></li>")
+      c = $("<li data-num=\"#{ item.num }\" class=\"#{ additionalClass }\">#{ item.title } <span>#{ item.username }</span></li>")
       ul = $("<ul></ul>")
       password = ""
       for char, i of item.password

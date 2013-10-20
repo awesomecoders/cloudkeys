@@ -134,31 +134,42 @@
     };
 
     CloudKeys.prototype.limitItems = function(items) {
-      var _this = this;
+      var current,
+        _this = this;
       $('#resultdescription span').text(items.length);
+      current = 0;
       $('#items>li').each(function(k, v) {
         var item;
         item = $(v);
+        item.removeClass('odd');
         if ($.inArray(item.data('num'), items) === -1) {
           item.addClass('hide');
         } else {
           if (item.hasClass('hide')) {
             item.removeClass('hide');
           }
+          if (current % 2 === 0) {
+            item.addClass('odd');
+          }
+          current = current + 1;
         }
       });
     };
 
     CloudKeys.prototype.showItems = function(items) {
-      var c, char, counter, i, item, itemContainer, lines_match, password, ul, _i, _len, _ref,
+      var additionalClass, c, char, counter, i, item, itemContainer, lines_match, password, ul, _i, _len, _ref,
         _this = this;
       $('#items li').remove();
       itemContainer = $('#items');
       $('#resultdescription span').text(items.length);
-      for (_i = 0, _len = items.length; _i < _len; _i++) {
-        item = items[_i];
+      for (i = _i = 0, _len = items.length; _i < _len; i = ++_i) {
+        item = items[i];
+        additionalClass = "";
+        if (i % 2 === 0) {
+          additionalClass = "odd";
+        }
         item = this.entities[item];
-        c = $("<li data-num=\"" + item.num + "\">" + item.title + " <span>" + item.username + "</span></li>");
+        c = $("<li data-num=\"" + item.num + "\" class=\"" + additionalClass + "\">" + item.title + " <span>" + item.username + "</span></li>");
         ul = $("<ul></ul>");
         password = "";
         _ref = item.password;
