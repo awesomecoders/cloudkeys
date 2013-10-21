@@ -13,11 +13,11 @@
         var that = this;
         if (evt.keyCode === 13) {
           _this.password = $(that).val();
+          $('#loader').removeClass('hide');
           _this.fetchData();
           $('#newEntityLink').click(function() {
             return _this.showForm();
           });
-          $('.hide').removeClass('hide');
           $('#passwordRequest').addClass('hide');
           $('#search').keyup(function() {
             var that = this;
@@ -220,6 +220,9 @@
         c.find('input').focus().select();
         itemContainer.append(c);
       }
+      $('.hide').removeClass('hide');
+      $('#loader').addClass('hide');
+      $('#passwordRequest').addClass('hide');
     };
 
     CloudKeys.prototype.getItems = function(search) {

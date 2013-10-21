@@ -7,11 +7,11 @@ class CloudKeys
       `var that = this`
       if evt.keyCode is 13
         @password = $(that).val()
+        $('#loader').removeClass('hide')
         @fetchData()
         $('#newEntityLink').click =>
           @showForm()
 
-        $('.hide').removeClass('hide')
         $('#passwordRequest').addClass('hide')
 
         $('#search').keyup =>
@@ -163,6 +163,11 @@ class CloudKeys
       c.find('input').focus().select()
 
       itemContainer.append(c)
+
+    $('.hide').removeClass('hide')
+    $('#loader').addClass('hide')
+    $('#passwordRequest').addClass('hide')
+
     return
 
   getItems: (search) ->
