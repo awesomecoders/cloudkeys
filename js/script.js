@@ -26,17 +26,33 @@
           $('#search').focus();
           return $(window).keyup(function(evt) {
             if (evt.altKey === true && evt.keyCode === 66) {
-              $('#items li.active .username').focus().select();
+              if (typeof window.copyToClipboard === "function") {
+                copyToClipboard($('#items li.active .username').val());
+              } else {
+                $('#items li.active .username').focus().select();
+              }
             }
             if (evt.altKey === true && evt.keyCode === 79) {
-              $('#items li.active .passwordtoggle em').click();
-              $('#items li.active .password').focus().select();
+              if (typeof window.copyToClipboard === "function") {
+                copyToClipboard($('#items li.active .password').data('toggle'));
+              } else {
+                $('#items li.active .passwordtoggle em').click();
+                $('#items li.active .password').focus().select();
+              }
             }
             if (evt.altKey === true && evt.keyCode === 80) {
-              $('#items li.active .password').focus().select();
+              if (typeof window.copyToClipboard === "function") {
+                copyToClipboard($('#items li.active .password').data('toggle'));
+              } else {
+                $('#items li.active .password').focus().select();
+              }
             }
             if (evt.altKey === true && evt.keyCode === 85) {
-              return $('#items li.active .url').focus().select();
+              if (typeof window.copyToClipboard === "function") {
+                return copyToClipboard($('#items li.active .url').val());
+              } else {
+                return $('#items li.active .url').focus().select();
+              }
             }
           });
         }

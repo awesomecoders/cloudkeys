@@ -21,14 +21,26 @@ class CloudKeys
         $('#search').focus()
         $(window).keyup (evt) =>
           if evt.altKey is true and evt.keyCode is 66
-            $('#items li.active .username').focus().select()
+            if typeof window.copyToClipboard is "function"
+              copyToClipboard($('#items li.active .username').val())
+            else
+              $('#items li.active .username').focus().select()
           if evt.altKey is true and evt.keyCode is 79 # workaround to copy password very fast
-            $('#items li.active .passwordtoggle em').click()
-            $('#items li.active .password').focus().select()
+            if typeof window.copyToClipboard is "function"
+              copyToClipboard($('#items li.active .password').data('toggle'))
+            else
+              $('#items li.active .passwordtoggle em').click()
+              $('#items li.active .password').focus().select()
           if evt.altKey is true and evt.keyCode is 80
-            $('#items li.active .password').focus().select()
+            if typeof window.copyToClipboard is "function"
+              copyToClipboard($('#items li.active .password').data('toggle'))
+            else
+              $('#items li.active .password').focus().select()
           if evt.altKey is true and evt.keyCode is 85
-            $('#items li.active .url').focus().select()
+            if typeof window.copyToClipboard is "function"
+              copyToClipboard($('#items li.active .url').val())
+            else
+              $('#items li.active .url').focus().select()
 
   import: (xml) ->
     parsedXML = $.parseXML(xml)
