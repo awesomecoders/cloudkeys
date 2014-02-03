@@ -92,7 +92,8 @@ class CloudKeys
 
     @entities.sort(@sortItems)
 
-    @showItems(@getItems($('#search').val()))
+    @showItems(@getItems(''))
+    @limitItems(@getItems($('#search').val()))
 
   encrypt: (value) ->
     return CryptoJS.AES.encrypt(value, @password).toString()

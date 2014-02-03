@@ -129,7 +129,8 @@
         }
       }
       this.entities.sort(this.sortItems);
-      return this.showItems(this.getItems($('#search').val()));
+      this.showItems(this.getItems(''));
+      return this.limitItems(this.getItems($('#search').val()));
     };
 
     CloudKeys.prototype.encrypt = function(value) {
