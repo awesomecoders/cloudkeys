@@ -3,8 +3,9 @@
 class AjaxHandler extends BaseHttpHandler {
 
   public function get($params) {
+    $user_index = $params[0];
     $this->response->header("Content-Type", "text/json;charset=utf-8");
-    $userdata = $this->checkLogin();
+    $userdata = $this->checkLogin($user_index);
     if($userdata !== null) {
       $data = json_decode($userdata->body, true);
       echo json_encode(array('version' => $data['metadata']['version'], 'data' => $data['data']));
@@ -14,15 +15,16 @@ class AjaxHandler extends BaseHttpHandler {
   }
 
   public function post($params) {
+    $user_index = $params[0];
     $this->response->header("Content-Type", "text/json;charset=utf-8");
 
-    $userfile = $this->getUserfile();
+    $userfile = $this->getUserfile($user_index);
     if($userfile === null) {
       echo json_encode(array('error' => true, 'type' => 'login'));
       return;
     }
 
-    $userdata = $this->checkLogin();
+    $userdata = $this->checkLogin($user_index);
     if($userdata === null) {
       echo json_encode(array('error' => true, 'type' => 'register'));
       return;
@@ -52,16 +54,18 @@ class AjaxHandler extends BaseHttpHandler {
     echo json_encode(array('version' => $data['metadata']['version'], 'data' => $data['data']));
   }
 
-  private function getUserfile() {
-    $userfile = $this->session->get('username');
+  private function getUserfile($user_index) {
+    $authorized_accounts = $this->session->get('authorized_accounts');
+    $userfile = $authorized_accounts[$user_index]['userfile'];
+
     if($userfile == "") {
       return null;
     }
     return $userfile;
   }
 
-  private function checkLogin() {
-    $userfile = $this->getUserfile();
+  private function checkLogin($user_index) {
+    $userfile = $this->getUserfile($user_index);
     if($userfile === null) {
       return null;
     }
