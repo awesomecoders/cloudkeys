@@ -38,7 +38,7 @@ class LoginHandler extends BaseHttpHandler {
         $this->session->set('authorized_accounts', $authorized_accounts);
 
         if($user_index !== null) {
-          $this->response->redirect('/u/' . $user_index . '/overview');
+          $this->response->redirect('u/' . $user_index . '/overview');
         } else {
           $this->response->set("error", true);
         }

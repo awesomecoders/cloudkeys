@@ -4,7 +4,7 @@ class OverviewHandler extends BaseHttpHandler {
 
   public function get($params) {
     if(count($params) < 1) {
-      $this->response->redirect('/u/0/overview');
+      $this->response->redirect('u/0/overview');
       return;
     } else {
       $user_index = $params[0];
@@ -13,13 +13,13 @@ class OverviewHandler extends BaseHttpHandler {
     $authorized_accounts = $this->session->get('authorized_accounts');
     $userfile = $authorized_accounts[$user_index]['userfile'];
     if($userfile == "") {
-      $this->response->redirect('/login');
+      $this->response->redirect('../../login');
       return;
     }
     try {
       S3::getObject($this->config->get('AWSS3Bucket'), $userfile);
     } catch(Exception $e) {
-      $this->response->redirect('/login');
+      $this->response->redirect('../../login');
       return;
     }
 
