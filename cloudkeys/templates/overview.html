@@ -3,30 +3,40 @@
   <head>
     <title>cloudkeys</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-    <link href="bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="css/style.css" rel="stylesheet" media="screen">
+    <link href="/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/css/style.css" rel="stylesheet" media="screen">
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="overview">cloud<strong>keys</strong></a>
+          <a class="navbar-brand" href="/u/{{ current_user_index }}/overview">cloud<strong>keys</strong></a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav hide">
-            <li class="active"><a href="overview">Home</a></li>
+            <li class="active"><a href="/u/{{ current_user_index }}/overview">Home</a></li>
             <li><a id="newEntityLink">New</a></li>
             <li><a id="importLink">Import</a></li>
           </ul>
           <ul class="nav navbar-nav pull-right">
-            <li><a href="logout">Logout</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Switch Account <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    {% for user in authorized_accounts %}
+                    <li><a href="/u/{{ loop.index0 }}/overview">{{ user }}</a></li>
+                    {% endfor %}
+                    <li class="divider"></li>
+                    <li><a href="/login">Add Account</a></li>
+                </ul>
+            </li>
+            <li><a href="/logout">Logout</a></li>
           </ul>
         </div>
       </div>
     </div>
     <div id="loader" class="container hide">
       <div class="row">
-        <img src="img/ajax-loader.gif" />
+        <img src="/img/ajax-loader.gif" />
       </div>
     </div>
     <div id="passwordRequest" class="container">
@@ -115,7 +125,7 @@
     <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
     <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha1.js"></script>
     <script src="//code.jquery.com/jquery.js"></script>
-    <script src="bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="js/script.js"></script>
+    <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/js/script.js"></script>
   </body>
 </html>

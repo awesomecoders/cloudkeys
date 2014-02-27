@@ -20,8 +20,28 @@ class LoginHandler extends BaseHttpHandler {
       $password = sha1($this->config->get('passwordSalt') . $password);
       $data = json_decode($existing->body, true);
       if(isset($data['metadata']['password']) && $data['metadata']['password'] == $password) {
-        $this->session->set('username', $this->createUserFilename($username));
-        $this->response->redirect('overview');
+        $authorized_accounts = $this->session->get('authorized_accounts', array());
+        $newuser = array('name' => $username, 'userfile' => $this->createUserFilename($username));
+
+        $user_index = null;
+        if(in_array($newuser, $authorized_accounts)) {
+          for($i = 0; $i < count($authorized_accounts); $i++) {
+            if($authorized_accounts[$i] == $newuser) {
+              $user_index = $i;
+              break;
+            }
+          }
+        } else {
+          $authorized_accounts[] = $newuser;
+          $user_index = count($authorized_accounts) - 1;
+        }
+        $this->session->set('authorized_accounts', $authorized_accounts);
+
+        if($user_index !== null) {
+          $this->response->redirect('/u/' . $user_index . '/overview');
+        } else {
+          $this->response->set("error", true);
+        }
         return;
       } else {
         $this->response->set("error", true);

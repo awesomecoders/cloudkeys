@@ -144,9 +144,9 @@
     CloudKeys.prototype.getClippyCode = function(value) {
       var code;
       code = '<span class="clippy"><object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="14" height="14" class="clippy">';
-      code += '<param name="movie" value="js/clippy.swf"/><param name="allowScriptAccess" value="always" /><param name="quality" value="high" />';
+      code += '<param name="movie" value="/js/clippy.swf"/><param name="allowScriptAccess" value="always" /><param name="quality" value="high" />';
       code += "<param name=\"scale\" value=\"noscale\" /><param name=\"FlashVars\" value=\"text=" + (encodeURIComponent(value)) + "\"><param name=\"bgcolor\" value=\"#e5e3e9\">";
-      code += "<embed src=\"js/clippy.swf\" width=\"14\" height=\"14\" name=\"clippy\" quality=\"high\" allowScriptAccess=\"always\" type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" FlashVars=\"text=" + (encodeURIComponent(value)) + "\" bgcolor=\"#e5e3e9\" /></object></span>";
+      code += "<embed src=\"/js/clippy.swf\" width=\"14\" height=\"14\" name=\"clippy\" quality=\"high\" allowScriptAccess=\"always\" type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\" FlashVars=\"text=" + (encodeURIComponent(value)) + "\" bgcolor=\"#e5e3e9\" /></object></span>";
       return code;
     };
 
