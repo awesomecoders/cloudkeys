@@ -43,7 +43,7 @@ class AjaxHandler extends BaseHttpHandler {
     }
 
     try {
-      S3::copyObject($this->config->get('AWSS3Bucket'), $userfile, $this->config->get('AWSS3Bucket'), $userfile . '.' . idate('U') . '.backup');
+      S3::copyObject($this->config->get('AWSS3Bucket'), $userfile, $this->config->get('AWSS3Bucket'), 'backup/' . $userfile . '.' . idate('U'));
       $data['metadata']['version'] = $this->request->get('checksum');
       $data['data'] = $this->request->get('data');
       S3::putObject(json_encode($data), $this->config->get('AWSS3Bucket'), $userfile);
