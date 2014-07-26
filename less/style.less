@@ -5,7 +5,13 @@ input {
   outline: 0;  
 }
 
-.navbar a { cursor: pointer; }
+.navbar a {
+  cursor: pointer;
+
+  &.active_account {
+    font-weight: bold;
+  }
+}
 #importContainer {
   display: none;
 
