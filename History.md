@@ -1,4 +1,12 @@
 
+1.5.0 / 2014-11-16
+==================
+
+  * Fixed ajax delivery
+  * Added deployment howto to readme file
+  * Added cloudkeys.de to manifest
+  * Added navbar button for mobile usage
+
 1.4 / 2014-07-26
 ==================
 
