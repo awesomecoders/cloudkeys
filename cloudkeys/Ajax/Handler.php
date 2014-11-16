@@ -5,40 +5,42 @@ class AjaxHandler extends BaseHttpHandler {
   public function get($params) {
     $user_index = $params[0];
     $this->response->header("Content-Type", "text/json;charset=utf-8");
+    $this->response->header('Cache-Control', 'no-cache');
     $userdata = $this->checkLogin($user_index);
     if($userdata !== null) {
       $data = json_decode($userdata->body, true);
-      echo json_encode(array('version' => $data['metadata']['version'], 'data' => $data['data']));
+      $this->response->json_output(array('version' => $data['metadata']['version'], 'data' => $data['data']));
     } else {
-      echo json_encode(array('error' => true));
+      $this->response->json_output(array('error' => true));
     }
   }
 
   public function post($params) {
     $user_index = $params[0];
     $this->response->header("Content-Type", "text/json;charset=utf-8");
+    $this->response->header('Cache-Control', 'no-cache');
 
     $userfile = $this->getUserfile($user_index);
     if($userfile === null) {
-      echo json_encode(array('error' => true, 'type' => 'login'));
+      $this->response->json_output(array('error' => true, 'type' => 'login'));
       return;
     }
 
     $userdata = $this->checkLogin($user_index);
     if($userdata === null) {
-      echo json_encode(array('error' => true, 'type' => 'register'));
+      $this->response->json_output(array('error' => true, 'type' => 'register'));
       return;
     }
 
     $data = json_decode($userdata->body, true);
     
     if($data['metadata']['version'] != $this->request->get('version')) {
-      echo json_encode(array('error' => true, 'type' => 'version'));
+      $this->response->json_output(array('error' => true, 'type' => 'version'));
       return;
     }
 
     if($this->request->get('checksum') != sha1($this->request->get('data'))) {
-      echo json_encode(array('error' => true, 'type' => 'checksum'));
+      $this->response->json_output(array('error' => true, 'type' => 'checksum'));
       return;
     }
 
@@ -48,10 +50,10 @@ class AjaxHandler extends BaseHttpHandler {
       $data['data'] = $this->request->get('data');
       S3::putObject(json_encode($data), $this->config->get('AWSS3Bucket'), $userfile);
     } catch(Exception $e) {
-      echo json_encode(array('error' => true, 'message' => $e->getMessage()));
+      $this->response->json_output(array('error' => true, 'message' => $e->getMessage()));
       return;
     }
-    echo json_encode(array('version' => $data['metadata']['version'], 'data' => $data['data']));
+    $this->response->json_output(array('version' => $data['metadata']['version'], 'data' => $data['data']));
   }
 
   private function getUserfile($user_index) {
